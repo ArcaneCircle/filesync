@@ -16,7 +16,11 @@ export class FileManager {
     this.request = null;
     this.setFiles = (files: FileMeta[]) => {
       this.realtime.setState({ files });
-      setFiles(files.filter((file) => file.size >= 0));
+      setFiles(
+        files
+          .filter((file) => file.size >= 0)
+          .sort((a, b) => b.lastModified - a.lastModified),
+      );
     };
     const onPeersChanged = async (peers: Peer<State>[]) => {
       console.log("peers changed");
