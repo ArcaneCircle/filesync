@@ -1,7 +1,6 @@
 import { useState } from "react";
 
 import { FileManager } from "~/lib/filemanager";
-// @ts-ignore
 import { Peer } from "@webxdc/realtime";
 
 import FileItem from "~/components/FileItem";

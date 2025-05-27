@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@webxdc/realtime':
-        specifier: ^0.2.1
-        version: 0.2.1
+        specifier: ^0.2.2
+        version: 0.2.2
       dexie:
         specifier: ^4.0.11
         version: 4.0.11
@@ -911,8 +911,8 @@ packages:
   '@webcontainer/env@1.1.1':
     resolution: {integrity: sha512-6aN99yL695Hi9SuIk1oC88l9o0gmxL1nGWWQ/kNy81HigJ0FoaoTXpytCj6ItzgyCEwA9kF1wixsTuv5cjsgng==}
 
-  '@webxdc/realtime@0.2.1':
-    resolution: {integrity: sha512-cUpmxjQwsN4IN5C+D/nQ6Sy+1eiOIRy+jP8kiyUd0nIdasndqAZCb1pxxuXfTrr8iKUkkqRCkSjl8P6vcKvFvQ==}
+  '@webxdc/realtime@0.2.2':
+    resolution: {integrity: sha512-BXMDWvITIcWIPVq8DXY69DMrvAQROpxpgO0OyouimE3HM+BxNZ0KP0WAi/hFWiMqImip4B8r3WHleer3hEwYag==}
 
   '@webxdc/types@2.1.2':
     resolution: {integrity: sha512-oklcyHvUXqCS5JwbPVaN8tt7nSB8ffRmyrUlVt0HeSn4kDyNE46oKSbw3KtrDzl530KHnm67LfcK/AjWbBoXUA==}
@@ -2834,7 +2834,7 @@ snapshots:
 
   '@webcontainer/env@1.1.1': {}
 
-  '@webxdc/realtime@0.2.1':
+  '@webxdc/realtime@0.2.2':
     dependencies:
       lib0: 0.2.108
 

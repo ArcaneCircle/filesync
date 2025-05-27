@@ -1,4 +1,3 @@
-// @ts-ignore
 import { RealTime, Peer } from "@webxdc/realtime";
 import { db } from "~/lib/storage";
 

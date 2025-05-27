@@ -20,7 +20,7 @@
     "vite": "latest"
   },
   "dependencies": {
-    "@webxdc/realtime": "^0.2.1",
+    "@webxdc/realtime": "^0.2.2",
     "dexie": "^4.0.11",
     "lib0": "^0.2.108",
     "preact": "^10.26.5"
