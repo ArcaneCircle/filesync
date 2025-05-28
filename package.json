@@ -9,7 +9,11 @@
     "build": "tsc && vite build"
   },
   "devDependencies": {
+    "@iconify/json": "^2.2.342",
     "@preact/preset-vite": "^2.10.1",
+    "@svgr/core": "^8.1.0",
+    "@svgr/plugin-jsx": "^8.1.0",
+    "@types/lodash": "^4.17.17",
     "@types/react": "^19.1.2",
     "@webxdc/types": "latest",
     "@webxdc/vite-plugins": "latest",
@@ -17,12 +21,14 @@
     "concurrently": "^9.1.2",
     "prettier": "latest",
     "typescript": "latest",
+    "unplugin-icons": "^22.1.0",
     "vite": "latest"
   },
   "dependencies": {
     "@webxdc/realtime": "^0.2.2",
     "dexie": "^4.0.11",
     "lib0": "^0.2.108",
+    "lodash": "^4.17.21",
     "preact": "^10.26.5"
   }
 }

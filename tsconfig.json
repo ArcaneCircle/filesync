@@ -10,6 +10,7 @@
     "paths": {
       "~/*": ["./src/*"]
     },
+    "types": ["unplugin-icons/types/react"],
 
     /* Bundler mode */
     "moduleResolution": "bundler",

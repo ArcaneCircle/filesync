@@ -1,3 +1,5 @@
+import throttle from "lodash/throttle";
+import shuffle from "lodash/shuffle";
 import { RealTime, Peer } from "@webxdc/realtime";
 import { db } from "~/lib/storage";
 
@@ -14,20 +16,22 @@ export class FileManager {
     setFiles: SetFilesCallback,
   ) {
     this.request = null;
+    const throttledSetFiles = throttle(setFiles, 400);
     this.setFiles = (files: FileMeta[]) => {
       this.realtime.setState({ files });
-      setFiles(
+      throttledSetFiles(
         files
           .filter((file) => file.size >= 0)
           .sort((a, b) => b.lastModified - a.lastModified),
       );
     };
+    const throttledSetPeers = throttle(setPeers, 400);
     const onPeersChanged = async (peers: Peer<State>[]) => {
-      console.log("peers changed");
+      //console.log("peers changed");
       const req = this.request;
       if (req && !peers.find((p) => p.id === req.peer)) this.request = null;
       await this.syncFileList(peers);
-      setPeers(peers);
+      throttledSetPeers(peers);
     };
     const onPayload = async (_deviceId: string, payload: Payload) => {
       await this.processPayload(payload);
@@ -107,7 +111,7 @@ export class FileManager {
   private async processPayload(payload: Payload) {
     if ("request" in payload) {
       const req = payload.request;
-      console.log("RECEIVED request", req);
+      //console.log("RECEIVED request", req);
       if (req.peer === this.realtime.getDeviceId()) {
         const file = await db.files.where("id").equals(req.file).first();
         if (file) {
@@ -121,7 +125,7 @@ export class FileManager {
       }
     } else if ("response" in payload) {
       const res = payload.response;
-      console.log("RECEIVED response", res);
+      //console.log("RECEIVED response", res);
       const files = this.realtime.getState()?.files || [];
       const file = files.find((f: FileMeta) => f.id === res.file);
       if (
@@ -156,12 +160,12 @@ export class FileManager {
       chunk: chunk.id,
       data: await blobToUint8Array(chunk.blob),
     };
-    console.log("SENT response", response);
+    //console.log("SENT response", response);
     this.realtime.sendPayload({ response });
   }
 
   private async sendRequest(request: PeerRequest) {
-    console.log("SENT request", request);
+    //console.log("SENT request", request);
     this.request = request;
     this.realtime.sendPayload({ request });
   }
@@ -170,7 +174,7 @@ export class FileManager {
     meta: FileMeta,
     chunkId: number,
   ): Promise<PeerRequest | null> {
-    for (const peer of this.realtime.getPeers()) {
+    for (const peer of shuffle(this.realtime.getPeers())) {
       const file = peer.state.files.find((f: FileMeta) => f.id === meta.id);
       if (
         file &&
@@ -194,7 +198,7 @@ export class FileManager {
       const files = this.realtime.getState()?.files || [];
       for (const file of files) {
         if (file.pending.length > 0) {
-          for (const chunkId of file.pending) {
+          for (const chunkId of shuffle(file.pending)) {
             request = await this.createRequest(file, chunkId);
             if (request) break;
           }
@@ -210,6 +214,7 @@ export class FileManager {
 
   private async syncFileList(peers: Peer<State>[]) {
     const files = this.realtime.getState()?.files || [];
+    let changed = false;
     for (const peer of peers) {
       for (let file of peer.state.files) {
         const myFile = files.find((f: FileMeta) => f.id === file.id);
@@ -222,6 +227,7 @@ export class FileManager {
           await db.files.add(file);
 
           files.push(file);
+          changed = true;
         } else if (myFile.lastModified < file.lastModified) {
           // update, drop outdated chunks
           file = { ...file, pending: [] };
@@ -239,10 +245,11 @@ export class FileManager {
           myFile.lastModified = file.lastModified;
           myFile.size = file.size;
           myFile.type = file.type;
+          changed = true;
         }
       }
     }
-    this.setFiles(files);
+    if (changed) this.setFiles(files);
   }
 }
 

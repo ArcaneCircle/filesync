@@ -1,4 +1,11 @@
+import { useMemo } from "react";
+
+import MageFileFill from "~icons/mage/file-fill";
+import MageDownload from "~icons/mage/download";
+import MageTrash2Fill from "~icons/mage/trash-2-fill";
+
 import { FileManager } from "~/lib/filemanager";
+import { formatDateShort, formatBytes } from "~/lib/util";
 
 interface Props {
   file: FileMeta;
@@ -6,31 +13,94 @@ interface Props {
 }
 
 export default function FileItem({ manager, file }: Props) {
-  const ShareBtn = ({ file }: { file: FileMeta }) => (
-    <button onClick={() => manager.exportFile(file)}>Share</button>
-  );
-
-  const DeleteBtn = ({ file }: { file: FileMeta }) => (
-    <button onClick={() => manager.deleteFile(file.id)}>Delete</button>
-  );
-
   const percentage = manager.getDownloadProgress(file);
+  const containerStyle = {
+    display: "flex",
+    flexDirection: "row" as "row",
+    flexWrap: "nowrap" as "nowrap",
+    alignItems: "stretch",
+    gap: "1em",
+  };
+  const fileIconStyle = {
+    color: percentage === 100 ? "#1E90FF" : "#737373",
+    width: "2em",
+    height: "auto",
+    flexShrink: "0",
+  };
+  const rightStyle = {
+    display: "flex",
+    justifyContent: "space-between",
+    flexGrow: "1",
+    borderBottom: "1px solid #e0e0e0",
+    padding: "1em 1em 1em 0",
+    overflow: "hidden",
+  };
+  const metaStyle = {
+    display: "flex",
+    flexDirection: "column" as "column",
+    gap: "0.3em",
+    overflow: "hidden",
+  };
+  const fileNameStyle = {
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    textWrap: "nowrap" as "nowrap",
+    whiteSpace: "nowrap",
+    color: percentage === 100 ? undefined : "#737373",
+  };
+  const iconsStyle = {
+    alignContent: "center",
+    flexShrink: "0",
+    marginLeft: "0.5em",
+  };
+  const btnStyle = {
+    color: "white",
+    border: "none",
+    borderRadius: "5px",
+  };
+
+  const shareBtn = useMemo(() => {
+    const style = {
+      ...btnStyle,
+      marginRight: "1em",
+      background: "#32CD32",
+    };
+    return (
+      <button style={style} onClick={() => manager.exportFile(file)}>
+        <MageDownload style={{ fontSize: "2em" }} />
+      </button>
+    );
+  }, [file.id]);
+
+  const deleteBtn = useMemo(
+    () => (
+      <button
+        style={{ ...btnStyle, background: "#da342f" }}
+        onClick={() => manager.deleteFile(file.id)}
+      >
+        <MageTrash2Fill style={{ fontSize: "2em" }} />
+      </button>
+    ),
+    [file.id],
+  );
+
+  //console.log(`[${file.id}] FILE ITEM RERENDERED`);
   return (
-    <div style={{ paddingBottom: "1em" }}>
-      {percentage}% {file.name} - {formatBytes(file.size)}{" "}
-      {!file.pending.length && <ShareBtn file={file} />}{" "}
-      <DeleteBtn file={file} />
-      <details>{JSON.stringify(file)}</details>
+    <div style={containerStyle}>
+      <MageFileFill style={fileIconStyle} />
+      <div style={rightStyle}>
+        <div style={metaStyle}>
+          <strong style={fileNameStyle}>{file.name}</strong>
+          <small style={{ color: "#737373" }}>
+            {percentage === 100 ? "" : percentage + "% - "}{" "}
+            {formatDateShort(file.lastModified)}, {formatBytes(file.size)}
+          </small>
+        </div>
+        <div style={iconsStyle}>
+          {!file.pending.length && shareBtn}
+          {deleteBtn}
+        </div>
+      </div>
     </div>
   );
-}
-
-function formatBytes(bytes: number, decimals = 2): string {
-  if (bytes === 0) return "0 Bytes";
-  const k = 1024; // Define the base for conversion
-  const dm = decimals < 0 ? 0 : decimals; // Ensure decimals is non-negative
-  const sizes = ["Bytes", "KB", "MB", "GB", "TB"]; // Define size units
-
-  const i = Math.floor(Math.log(bytes) / Math.log(k)); // Determine the index for the size unit
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i]; // Format and return the result
 }
